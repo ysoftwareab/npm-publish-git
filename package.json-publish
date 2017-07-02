@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+var __cwd = process.cwd();
+
+var pkg = require(__cwd + '/package.json');
+delete pkg.devDependencies;
+
+if (pkg.scripts) {
+  delete pkg.scripts.prepare;
+}
+
+if (pkg.publishConfig) {
+  pkg = Object.assign(pkg, pkg.publishConfig);
+  delete pkg.publishConfig;
+}
+
+pkg = JSON.stringify(pkg, null, 2);
+console.log(pkg);

@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#- npm-publish-git 1.0
+## Usage: npm-publish-git [OPTION]
+## Publish an NPM package to git tag.
+##
+##   --tag TAG      Use specific dist tag. "X.Y.Z" will be replaced with the current version
+##
+##   -h, --help     Display this help and exit
+##   -v, --version  Output version information and exit
+
+[ -f package.json ] || {
+    echo >&2 "package.json is missing."
+    exit 1
+}
+
+[ -z "$(git status --porcelain)" ] || {
+    echo >&2 "git status shows changed/untracked files."
+    exit 1
+}
+
+# https://stackoverflow.com/a/246128/465684
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+COMMIT=$(git rev-parse --verify HEAD 2>/dev/null)
+VSN=$(${DIR}/package.json-version)
+VSN_TAG=v${VSN}
+VSN_SRC_TAG=${VSN_TAG}
+VSN_DIST_TAG=${VSN_TAG}
+CUSTOM_TAG=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --tag)
+            CUSTOM_TAG=true
+            VSN_DIST_TAG="${2/X.Y.Z/${VSN}}"
+            shift 2
+            ;;
+        -h|--help)
+            grep "^##" "${0}" | cut -c 4-
+            exit 1
+            ;;
+        -v|--version)
+            grep "^#-" "${0}" | cut -c 4-
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+    VSN_SRC_TAG=${VSN_TAG}-src
+
+[ ${CUSTOM_TAG} = false ] ||
+    git tag --points-at ${COMMIT} | grep -q "^${VSN_TAG}$" || {
+        echo >&2 "Current commit ${COMMIT} is not version tagged ${VSN_TAG}."
+        exit 1
+    }
+
+git ls-remote --exit-code --tags origin ${VSN_DIST_TAG} && {
+    echo >&2 "There is already a published version of ${VSN_DIST_TAG}."
+} || true
+
+function on_exit() {
+    local ERR="$?"
+
+    git reset --hard ${COMMIT} >/dev/null
+    git checkout .
+    git clean -df 2>/dev/null
+    [ ${ERR} != 0 ] ||
+        return;
+
+    git tag -d ${VSN_SRC_TAG} >/dev/null
+    git tag -d ${VSN_DIST_TAG} >/dev/null
+    git tag -f ${VSN_TAG} >/dev/null
+}
+
+trap on_exit EXIT
+
+TARBALL=$(npm pack)
+ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" | xargs rm -rf
+tar -xf ${TARBALL}
+ls -A package | xargs -I {} mv package/{} ./
+
+rm -rf ${TARBALL} package
+[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+    git tag -f ${VSN_SRC_TAG} ${VSN_TAG} >/dev/null
+${DIR}/package.json-publish > published.package.json
+mv {published.,}package.json
+git add -Af
+git commit -q --allow-empty -m "${VSN} (dist)"
+git tag -f ${VSN_DIST_TAG} >/dev/null
+
+echo "Published ${VSN}"
+echo "       as $(git rev-parse --verify HEAD 2>/dev/null) (${VSN_DIST_TAG})"
+echo " based on ${COMMIT} (${VSN_SRC_TAG})"
+
+PUSH_TAGS="${VSN_DIST_TAG}:refs/tags/${VSN_DIST_TAG}"
+[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+    PUSH_TAGS="${PUSH_TAGS} ${VSN_SRC_TAG}:refs/tags/${VSN_SRC_TAG}"
+git push -f origin ${PUSH_TAGS}

@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+
+var __cwd = process.cwd();
+
+var pkg = require(__cwd + '/package.json');
+console.log(pkg.version);
