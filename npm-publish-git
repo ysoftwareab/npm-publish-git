@@ -33,8 +33,13 @@ COMMIT=$(git rev-parse --verify HEAD 2>/dev/null)
 VSN=$(${DIR}/package.json-version)
 VSN_TAG=v${VSN}
 VSN_SRC_TAG=${VSN_TAG}
-VSN_DIST_TAG=${VSN_TAG}
-CUSTOM_TAG=false
+VSN_DIST_TAG=$(${DIR}/package.json-publishConfig-tag)
+CUSTOM_TAG=true
+
+[ -n "${VSN_DIST_TAG}" ] || {
+    VSN_DIST_TAG=${VSN_TAG}
+    CUSTOM_TAG=false
+}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in

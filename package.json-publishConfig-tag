@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+var __cwd = process.cwd();
+
+var pkg = require(__cwd + '/package.json');
+if (!pkg.publishConfig || !pkg.publishConfig.tag) {
+  return;
+}
+console.log(pkg.publishConfig.tag);
