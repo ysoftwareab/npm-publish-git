@@ -4,6 +4,32 @@ Works, or should work, as `npm publish` does towards an npm registry,
 except the target is the git repository itself.
 
 
+## Install
+
+```shell
+npm install --save-dev git://github.com/andreineculau/npm-publish-git.git
+```
+
+## Usage
+
+```shell
+npm version patch
+# tag v1.0.1 created
+
+node_modules/.bin/npm-publish-git
+# tag v1.0.1-src created, pointing to the v1.0.1 commit above
+# tag v1.0.1 updated (=moved) to point to a commit that contains
+#            only the artifacts sourced from the v1.0.1 commit above
+```
+
+Alternatively, you can publish to a tag of your choice, from any commit:
+
+```shell
+node_modules/.bin/npm-publish-git --tag latest
+# tag latest created/updated to point to a commit that contains
+#            only the artifacts sourced from the current commit
+```
+
 ## Raison d'être
 
 In the world of binary artifacts, it may make sense to have a package manager.
