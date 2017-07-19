@@ -65,7 +65,7 @@ done
 [ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
     VSN_SRC_TAG=${VSN_TAG}-src
 
-[ ${CUSTOM_TAG} = false ] ||
+[ ${CUSTOM_TAG} = true ] ||
     git tag --points-at ${COMMIT} | grep -q "^${VSN_TAG}$" || {
         echo >&2 "Current commit ${COMMIT} is not version tagged ${VSN_TAG}."
         exit 1
