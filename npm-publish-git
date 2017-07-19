@@ -91,7 +91,7 @@ function on_exit() {
 
 trap on_exit EXIT
 
-TARBALL=$(npm pack)
+TARBALL=$(npm pack | tail -1)
 ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" | xargs rm -rf
 tar -xf ${TARBALL}
 ls -A package | xargs -I {} mv package/{} ./
