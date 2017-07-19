@@ -92,15 +92,16 @@ function on_exit() {
 trap on_exit EXIT
 
 TARBALL=$(npm pack | tail -1)
-ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" | xargs rm -rf
+${DIR}/package.json-publish > published.package.json
+ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" -e "^published.package.json$" | xargs rm -rf
 tar -xf ${TARBALL}
 ls -A package | xargs -I {} mv package/{} ./
 
 rm -rf ${TARBALL} package
+mv {published.,}package.json
+
 [ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
     git tag -f ${VSN_SRC_TAG} ${VSN_TAG} >/dev/null
-${DIR}/package.json-publish > published.package.json
-mv {published.,}package.json
 git add -Af
 git commit -q --allow-empty -m "${VSN} (dist)"
 git tag -f ${VSN_DIST_TAG} >/dev/null
