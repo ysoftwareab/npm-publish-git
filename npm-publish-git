@@ -84,9 +84,9 @@ function on_exit() {
     [ ${ERR} != 0 ] ||
         return;
 
-    git tag -d ${VSN_SRC_TAG} >/dev/null
-    git tag -d ${VSN_DIST_TAG} >/dev/null
-    git tag -f ${VSN_TAG} >/dev/null
+    git tag -d ${VSN_SRC_TAG} >/dev/null || true
+    git tag -d ${VSN_DIST_TAG} >/dev/null || true
+    git tag -f ${VSN_TAG} >/dev/null || true
 }
 
 trap on_exit EXIT
