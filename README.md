@@ -30,6 +30,25 @@ node_modules/.bin/npm-publish-git --tag latest
 #            only the artifacts sourced from the current commit
 ```
 
+Now anyone that wants to use your package can turn their `package.json` into
+
+```json
+{
+  "...": "...",
+  "dependencies": {
+    "example1": "git://github.com/user/example1.git#semver:^1.2.3",
+    "example2": "git+ssh://git@git.intra/example2.git#commitish"
+  },
+  "...": "...",
+}
+```
+
+meaning they can install your package via
+`npm install git://github.com/user/example1.git#semver:^1.2.3`, etc.
+
+**NOTE** the `semver:` pattern is only available since npm@5 .
+
+
 ## Raison d'être
 
 In the world of binary artifacts, it may make sense to have a package manager.
