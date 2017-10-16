@@ -76,8 +76,8 @@ git ls-remote --exit-code --tags origin ${VSN_DIST_TAG} && {
 } || true
 
 
-git stash save -q --all
-git stash apply -q "stash@{0}"
+# git stash doesn't handle submodules
+tar -cf .git/npm-publish-git-stash.tar --exclude=./.git .
 
 function on_exit() {
     local ERR="$?"
@@ -85,7 +85,7 @@ function on_exit() {
     git reset --hard ${COMMIT} >/dev/null
     git checkout .
     git clean -df 2>/dev/null
-    git stash pop -q || true
+    tar -xf .git/npm-publish-git-stash.tar ./
     [ ${ERR} != 0 ] ||
         exit ${ERR};
 
