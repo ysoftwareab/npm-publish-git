@@ -110,7 +110,9 @@ mv {published.,}package.json
 [ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
     git tag -f ${VSN_SRC_TAG} ${VSN_TAG} >/dev/null
 git add -Af
-git commit -q --allow-empty -m "${VSN} (dist)"
+COMMIT_MSG="${VSN} (dist)"
+[ ${CUSTOM_TAG} = false ] || COMMIT_MSG="${VSN} (${COMMIT})"
+git commit -q --allow-empty -m "${COMMIT_MSG}"
 git tag -f ${VSN_DIST_TAG} >/dev/null
 
 echo "Published ${VSN}"
