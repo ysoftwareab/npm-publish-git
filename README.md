@@ -75,6 +75,15 @@ The only advantages of publishing to NPM are:
 - ?
 
 
+## Comparison
+
+In my initial search, I did not any previous implementations that serve the purpose, but there are. In retrospect, `npm-publish-git` is still superior in stability, parity with npm and simplicity (a bash script treating git and npm as blackboxes). Don't trust me, I'm biased, verify for yourself.
+
+* https://github.com/theoy/npm-git-publish (implemented via TypeScript, calling npm's JS APIs)
+* https://github.com/finom/deploy-to-git (not npm specific, pushes a folder to a git repository)
+* ?
+
+
 ## License
 
 [Apache 2.0](LICENSE)
