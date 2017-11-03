@@ -85,7 +85,7 @@ function on_exit() {
     git reset --hard ${COMMIT} >/dev/null
     git checkout .
     git clean -df 2>/dev/null
-    tar -xf .git/npm-publish-git-stash.tar ./
+    tar -xf .git/npm-publish-git-stash.tar
     [ ${ERR} != 0 ] ||
         exit ${ERR};
 
