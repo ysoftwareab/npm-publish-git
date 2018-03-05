@@ -119,6 +119,8 @@ echo "Published ${VSN}"
 echo "       as $(git rev-parse --verify HEAD 2>/dev/null) (${VSN_DIST_TAG})"
 echo " based on ${COMMIT} (${VSN_SRC_TAG})"
 
+git ls-tree --name-only --full-tree -r ${VSN_DIST_TAG}
+
 PUSH_TAGS=${VSN_DIST_TAG}:refs/tags/${VSN_DIST_TAG}
 [[ ${VSN_DIST_TAG} != ${VSN_TAG} ]] ||
     PUSH_TAGS="${PUSH_TAGS} ${VSN_SRC_TAG}:refs/tags/${VSN_SRC_TAG}"
