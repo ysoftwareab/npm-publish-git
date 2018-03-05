@@ -10,24 +10,24 @@ set -euo pipefail
 ##   -h, --help     Display this help and exit
 ##   -v, --version  Output version information and exit
 
-[ -f package.json ] || {
+[[ -f package.json ]] || {
     echo >&2 "package.json is missing."
     exit 1
 }
 
-[ -z "$(git status --porcelain)" ] || {
+[[ -z $(git status --porcelain) ]] || {
     echo >&2 "git status shows changed/untracked files."
     exit 1
 }
 
 # https://stackoverflow.com/a/246128/465684
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+SOURCE=${BASH_SOURCE[0]}
+while [[ -h ${SOURCE} ]]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$(cd -P $(dirname ${SOURCE}) && pwd)
+  SOURCE=$(readlink ${SOURCE})
+  [[ ${SOURCE} != /* ]] && SOURCE=${DIR}/${SOURCE} # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+DIR=$(cd -P $(dirname ${SOURCE}) && pwd)
 
 COMMIT=$(git rev-parse --verify HEAD 2>/dev/null)
 VSN=$(${DIR}/package.json-version)
@@ -36,7 +36,7 @@ VSN_SRC_TAG=${VSN_TAG}
 VSN_DIST_TAG=$(${DIR}/package.json-publishConfig-tag)
 CUSTOM_TAG=true
 
-[ -n "${VSN_DIST_TAG}" ] || {
+[[ -n ${VSN_DIST_TAG} ]] || {
     VSN_DIST_TAG=${VSN_TAG}
     CUSTOM_TAG=false
 }
@@ -49,11 +49,11 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -h|--help)
-            grep "^##" "${0}" | cut -c 4-
+            grep "^##" "$0" | cut -c 4-
             exit 1
             ;;
         -v|--version)
-            grep "^#-" "${0}" | cut -c 4-
+            grep "^#-" "$0" | cut -c 4-
             exit 1
             ;;
         *)
@@ -62,10 +62,10 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+[[ ${VSN_DIST_TAG} != ${VSN_TAG} ]] ||
     VSN_SRC_TAG=${VSN_TAG}-src
 
-[ ${CUSTOM_TAG} = true ] ||
+[[ ${CUSTOM_TAG} = true ]] ||
     git tag --points-at ${COMMIT} | grep -q "^${VSN_TAG}$" || {
         echo >&2 "Current commit ${COMMIT} is not version tagged ${VSN_TAG}."
         exit 1
@@ -80,13 +80,13 @@ git ls-remote --exit-code --tags origin ${VSN_DIST_TAG} && {
 tar -cf .git/npm-publish-git-stash.tar --exclude=./.git .
 
 function on_exit() {
-    local ERR="$?"
+    local ERR=$?
 
     git reset --hard ${COMMIT} >/dev/null
     git checkout .
     git clean -df 2>/dev/null
     tar -xf .git/npm-publish-git-stash.tar
-    [ ${ERR} != 0 ] ||
+    [[ ${ERR} != 0 ]] ||
         exit ${ERR};
 
     git tag -d ${VSN_SRC_TAG} >/dev/null || true
@@ -107,11 +107,11 @@ ls -A package | xargs -I {} mv package/{} ./
 rm -rf ${TARBALL} package
 mv {published.,}package.json
 
-[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+[[ ${VSN_DIST_TAG} != ${VSN_TAG} ]] ||
     git tag -f ${VSN_SRC_TAG} ${VSN_TAG} >/dev/null
 git add -Af
 COMMIT_MSG="${VSN} (dist)"
-[ ${CUSTOM_TAG} = false ] || COMMIT_MSG="${VSN} (${COMMIT})"
+[[ ${CUSTOM_TAG} = false ]] || COMMIT_MSG="${VSN} (${COMMIT})"
 git commit -q --allow-empty -m "${COMMIT_MSG}"
 git tag -f ${VSN_DIST_TAG} >/dev/null
 
@@ -119,7 +119,7 @@ echo "Published ${VSN}"
 echo "       as $(git rev-parse --verify HEAD 2>/dev/null) (${VSN_DIST_TAG})"
 echo " based on ${COMMIT} (${VSN_SRC_TAG})"
 
-PUSH_TAGS="${VSN_DIST_TAG}:refs/tags/${VSN_DIST_TAG}"
-[ "${VSN_DIST_TAG}" != "${VSN_TAG}" ] ||
+PUSH_TAGS=${VSN_DIST_TAG}:refs/tags/${VSN_DIST_TAG}
+[[ ${VSN_DIST_TAG} != ${VSN_TAG} ]] ||
     PUSH_TAGS="${PUSH_TAGS} ${VSN_SRC_TAG}:refs/tags/${VSN_SRC_TAG}"
 git push -f origin ${PUSH_TAGS}
