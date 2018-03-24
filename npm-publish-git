@@ -73,6 +73,7 @@ done
 
 git ls-remote --exit-code --tags origin ${VSN_DIST_TAG} && {
     echo >&2 "There is already a published version of ${VSN_DIST_TAG}."
+    exit 1
 } || true
 
 
