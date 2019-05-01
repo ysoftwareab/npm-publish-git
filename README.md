@@ -69,7 +69,8 @@ and you don't need any of the above overhead?
 
 The only advantages of publishing to NPM are:
 - caching - [track issue](https://github.com/zkat/pacote/issues/94)
-- centralized uptime
+- centralized uptime (read "if npm is down, the whole world is down, and everyone will work/wait for a fix";
+  it is obviously a disadvantage otherwise)
 - exposure
 - usage statistics
 - ?
