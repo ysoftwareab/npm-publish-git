@@ -126,4 +126,4 @@ git ls-tree --name-only --full-tree -r ${VSN_DIST_TAG}
 PUSH_TAGS=${VSN_DIST_TAG}:refs/tags/${VSN_DIST_TAG}
 [[ ${VSN_DIST_TAG} != ${VSN_TAG} ]] ||
     PUSH_TAGS="${PUSH_TAGS} ${VSN_SRC_TAG}:refs/tags/${VSN_SRC_TAG}"
-git push -f origin ${PUSH_TAGS}
+git push --no-verify -f origin ${PUSH_TAGS}
