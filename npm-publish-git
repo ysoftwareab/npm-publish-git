@@ -6,6 +6,7 @@ set -euo pipefail
 ## Publish an NPM package to git tag.
 ##
 ##   --tag TAG      Use specific dist tag. "X.Y.Z" will be replaced with the current version
+##   --dir DIR      Publish the package in the specified subdirectory
 ##
 ##   -h, --help     Display this help and exit
 ##   -v, --version  Output version information and exit
@@ -46,6 +47,10 @@ while [[ $# -gt 0 ]]; do
         --tag)
             CUSTOM_TAG=true
             VSN_DIST_TAG="${2/X.Y.Z/${VSN}}"
+            shift 2
+            ;;
+        --dir)
+            CUSTOM_DIR=$2
             shift 2
             ;;
         -h|--help)
@@ -99,7 +104,12 @@ function on_exit() {
 
 trap on_exit EXIT
 
-TARBALL=$(npm pack | tail -1)
+TARBALL=$(if [ -n "$CUSTOM_DIR" ]; then cd "$CUSTOM_DIR"; fi; npm pack | tail -1)
+if [ -n "$CUSTOM_DIR" ]
+then
+    mv "$CUSTOM_DIR/$TARBALL" "$TARBALL"
+fi
+
 ${DIR}/package.json-publish > published.package.json
 
 ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" -e "^published.package.json$" | xargs rm -rf
