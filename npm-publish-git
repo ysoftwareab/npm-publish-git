@@ -108,9 +108,13 @@ TARBALL=$(if [ -n "$CUSTOM_DIR" ]; then cd "$CUSTOM_DIR"; fi; npm pack | tail -1
 if [ -n "$CUSTOM_DIR" ]
 then
     mv "$CUSTOM_DIR/$TARBALL" "$TARBALL"
+    (
+        cd "$CUSTOM_DIR"
+        ${DIR}/package.json-publish
+    ) > published.package.json
+else
+    ${DIR}/package.json-publish > published.package.json
 fi
-
-${DIR}/package.json-publish > published.package.json
 
 ls -A | grep -v -e "^${TARBALL}\$" -e "^.git$" -e "^published.package.json$" | xargs rm -rf
 tar -xf ${TARBALL}
