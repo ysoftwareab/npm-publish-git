@@ -1,9 +1,9 @@
 {
-  "name": "npm-publish-git",
+  "name": "@hedgepigdaniel/npm-publish-git",
   "version": "0.0.10",
   "repository": {
     "type": "git",
-    "url": "git://github.com/andreineculau/npm-publish-git.git"
+    "url": "git://github.com/hedgepigdaniel/npm-publish-git.git"
   },
   "author": "Andrei Neculau",
   "license": "Apache-2.0",
