@@ -1,11 +1,7 @@
 {
+  "private": true,
   "name": "npm-publish-git",
   "version": "0.0.10",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/andreineculau/npm-publish-git.git"
-  },
-  "author": "Andrei Neculau",
   "license": "Apache-2.0",
   "bin": {
     "npm-publish-git": "./npm-publish-git"
