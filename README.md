@@ -7,7 +7,7 @@ except the target is the git repository itself.
 ## Install
 
 ```shell
-npm install --save-dev git://github.com/andreineculau/npm-publish-git.git
+npm install --save-dev git+https://github.com/andreineculau/npm-publish-git.git
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ Now anyone that wants to use your package can turn their `package.json` into
 {
   "...": "...",
   "dependencies": {
-    "example1": "git://github.com/user/example1.git#semver:^1.2.3",
+    "example1": "git+https://github.com/user/example1.git#semver:^1.2.3",
     "example2": "git+ssh://git@git.intra/example2.git#commitish"
   },
   "...": "...",
@@ -44,7 +44,7 @@ Now anyone that wants to use your package can turn their `package.json` into
 ```
 
 meaning they can install your package via
-`npm install git://github.com/user/example1.git#semver:^1.2.3`, etc.
+`npm install git+https://github.com/user/example1.git#semver:^1.2.3`, etc.
 
 **NOTE** the `semver:` pattern is only available since npm@5 .
 
